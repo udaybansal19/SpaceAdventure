@@ -1,0 +1,139 @@
+/*
+ * Copyright 2018 Google LLC
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.google.ar.sceneform.samples.hellosceneform"
+
+        // Sceneform requires minSdkVersion >= 24.
+        minSdkVersion 24
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+    // Sceneform libraries use language constructs from Java 8.
+    // Add these compile options if targeting minSdkVersion < 26.
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+
+    // Provides ArFragment, and other Sceneform UX resources:
+    implementation "com.google.ar.sceneform.ux:sceneform-ux:1.14.0"
+
+    // Use the Sceneform UX Package built from the source files included in the sceneformux folder.
+    //api project(":sceneformux")
+
+    // Alternatively, use ArSceneView without the UX dependency.
+    //implementation "com.google.ar.sceneform:core:1.14.0"
+
+    implementation "com.android.support:appcompat-v7:28.0.0"
+}
+
+apply plugin: 'com.google.ar.sceneform.plugin'
+
+sceneform.asset('sampledata/models/andy.obj',
+        'default',
+        'sampledata/models/andy.sfa',
+        'src/main/res/raw/andy')
+
+
+
+sceneform.asset('sampledata/models/Arrow.fbx',
+        'default',
+        'sampledata/models/Arrow.sfa',
+        'src/main/assets/Arrow')
+
+sceneform.asset('sampledata/models/highlight.fbx',
+        'default',
+        'sampledata/models/highlight.sfa',
+        'src/main/assets/highlight')
+
+
+sceneform.asset('sampledata/models/Earth.fbx',
+        'default',
+        'sampledata/models/Earth.sfa',
+        'src/main/assets/Earth')
+
+sceneform.asset('sampledata/Space/Astronaut.fbx',
+        'default',
+        'sampledata/Space/Astronaut.sfa',
+        'src/main/assets/Astronaut')
+
+sceneform.asset('sampledata/Space/jupiter.fbx',
+        'default',
+        'sampledata/Space/jupiter.sfa',
+        'src/main/assets/jupiter')
+
+sceneform.asset('sampledata/Space/mars.fbx',
+        'default',
+        'sampledata/Space/mars.sfa',
+        'src/main/assets/mars')
+
+sceneform.asset('sampledata/Space/mercury.fbx',
+        'default',
+        'sampledata/Space/mercury.sfa',
+        'src/main/assets/mercury')
+
+sceneform.asset('sampledata/Space/neptune.fbx',
+        'default',
+        'sampledata/Space/neptune.sfa',
+        'src/main/assets/neptune')
+
+sceneform.asset('sampledata/Space/pluto.fbx',
+        'default',
+        'sampledata/Space/pluto.sfa',
+        'src/main/assets/pluto')
+
+sceneform.asset('sampledata/Space/saturn.fbx',
+        'default',
+        'sampledata/Space/saturn.sfa',
+        'src/main/assets/saturn')
+
+sceneform.asset('sampledata/Space/Spacestation.fbx',
+        'default',
+        'sampledata/Space/Spacestation.sfa',
+        'src/main/assets/Spacestation')
+
+sceneform.asset('sampledata/Space/ufo.fbx',
+        'default',
+        'sampledata/Space/ufo.sfa',
+        'src/main/assets/ufo')
+
+sceneform.asset('sampledata/Space/uranus.fbx',
+        'default',
+        'sampledata/Space/uranus.sfa',
+        'src/main/assets/uranus')
+
+sceneform.asset('sampledata/Space/venus.fbx',
+        'default',
+        'sampledata/Space/venus.sfa',
+        'src/main/assets/venus')
+
+sceneform.asset('sampledata/Space/spaceship.fbx',
+        'default',
+        'sampledata/Space/spaceship.sfa',
+        'src/main/assets/spaceship')
