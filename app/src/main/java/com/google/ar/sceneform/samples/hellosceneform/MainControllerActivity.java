@@ -74,6 +74,10 @@ public class MainControllerActivity extends AppCompatActivity {
     private Node andy;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
+    private Vector3 startNodePosition = new Vector3(0f,0f,-1f);
+    private Vector3 rightNodePosition = new Vector3(0.6f,0f,0f);
+    private Vector3 leftNodePosition = new Vector3(-0.6f,0f,0f);
+    private Vector3 centerNodePosition = new Vector3(0f,0f,0f);
 
   @Override
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
@@ -129,19 +133,13 @@ public class MainControllerActivity extends AppCompatActivity {
                           return;
                       }
                       oneTimeFlag++;
-                      // Create the Anchor.
                       Anchor anchor = hitResult.createAnchor();
                       endNode = new AnchorNode(anchor);
                       endNode.setParent(arFragment.getArSceneView().getScene());
 
-                      // Create the transformable andy and add it to the anchor.
-//                andy = new Node();
-//                andy.setParent(startNode);
-//                andy.setRenderable(andyRenderable);
-                      // Create the end position and start the animation.
                       startNode = new AnchorNode();
                       startNode.setParent(endNode);
-                      startNode.setLocalPosition(new Vector3(0f, 0f, -1f));
+                      startNode.setLocalPosition(startNodePosition);
 
                       playerPositionNode.setParent(endNode);
 
@@ -151,41 +149,11 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       playerPositionNode.setLocalScale(scale);
 
-                      rightNode.setLocalPosition(new Vector3(0.6f,0f,0f));
-                      leftNode.setLocalPosition(new Vector3(-0.6f,0f,0f));
-
-                      Vector3 point1, point2;
-                      point1 = startNode.getWorldPosition();
-                      point2 = endNode.getWorldPosition();
-
-    /*
-        First, find the vector extending between the two points and define a look rotation
-        in terms of this Vector.
-    */
-                      final Vector3 difference = Vector3.subtract(point1, point2);
-                      final Vector3 directionFromTopToBottom = difference.normalized();
-                      final Quaternion rotationFromAToB =
-                              Quaternion.lookRotation(directionFromTopToBottom, Vector3.up());
-                      MaterialFactory.makeOpaqueWithColor(getApplicationContext(), new Color(0, 0, 0, 0.01f))
-                              .thenAccept(
-                                      material -> {
-                            /* Then, create a rectangular prism, using ShapeFactory.makeCube() and use the difference vector
-                                   to extend to the necessary length.  */
-                                          ModelRenderable model = ShapeFactory.makeCube(
-                                                  new Vector3(1f, 0f, difference.length()),
-                                                  Vector3.zero(), material);
-                            /* Last, set the world rotation of the node to the rotation calculated earlier and set the world position to
-                                   the midpoint between the given points . */
-                                          Node node = new Node();
-                                          node.setParent(endNode);
-                                          node.setRenderable(model);
-                                          node.setWorldPosition(Vector3.add(point1, point2).scaled(.5f));
-                                          node.setWorldRotation(rotationFromAToB);
-                                      }
-                              );
+                      rightNode.setLocalPosition(rightNodePosition);
+                      leftNode.setLocalPosition(leftNodePosition);
 
                       playerNode.setParent(endNode);
-                      playerNode.setLocalScale(new Vector3(0.5f,0.5f,0.5f));
+                      playerNode.setLocalScale(scale);
                       playerNode.setRenderable(playerRenderable);
 
                       //Move player ship
@@ -260,7 +228,7 @@ public class MainControllerActivity extends AppCompatActivity {
   private Node planetsSet(){
       planetsSetNode = new AnchorNode();
       planetsSetNode.setParent(endNode);
-      planetsSetNode.setLocalPosition(new Vector3(0f,0f,-1f));
+      planetsSetNode.setLocalPosition(startNodePosition);
 
       Node st1 = new Node();
       Node st2 = new Node();
@@ -276,9 +244,9 @@ public class MainControllerActivity extends AppCompatActivity {
       int r = rand.nextInt(3);
 
 
-      st1.setLocalPosition(new Vector3(0.6f,0f,0f));
-      st2.setLocalPosition(new Vector3(0f,0f,0f));
-      st3.setLocalPosition(new Vector3(-0.6f,0f,0f));
+      st1.setLocalPosition(rightNodePosition);
+      st2.setLocalPosition(centerNodePosition);
+      st3.setLocalPosition(leftNodePosition);
 
       ModelRenderable m1 = randomObj();
       ModelRenderable m2 = randomObj();
