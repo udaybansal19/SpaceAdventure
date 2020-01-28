@@ -62,14 +62,18 @@ public class MainControllerActivity extends AppCompatActivity {
   private ObjectAnimator objectAnimation;
 
     private int oneTimeFlag = 0;
+    private int position = 2;
     private AnchorNode startNode;
     private AnchorNode endNode;
     private AnchorNode planetsSetNode;
     private Node playerNode = new Node();
+    private Node playerPositionNode = new Node();
     private Node rightNode = new Node();
     private Node leftNode = new Node();
     private Node centerNode = new Node();
     private Node andy;
+
+    private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
 
   @Override
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
@@ -139,9 +143,13 @@ public class MainControllerActivity extends AppCompatActivity {
                       startNode.setParent(endNode);
                       startNode.setLocalPosition(new Vector3(0f, 0f, -1f));
 
-                      centerNode.setParent(endNode);
-                      rightNode.setParent(endNode);
-                      leftNode.setParent(endNode);
+                      playerPositionNode.setParent(endNode);
+
+                      centerNode.setParent(playerPositionNode);
+                      rightNode.setParent(playerPositionNode);
+                      leftNode.setParent(playerPositionNode);
+
+                      playerPositionNode.setLocalScale(scale);
 
                       rightNode.setLocalPosition(new Vector3(0.6f,0f,0f));
                       leftNode.setLocalPosition(new Vector3(-0.6f,0f,0f));
@@ -183,18 +191,26 @@ public class MainControllerActivity extends AppCompatActivity {
                       //Move player ship
                       View.OnTouchListener onTouchListener = new OnSwipeTouchListener(MainControllerActivity.this) {
                           public void onSwipeRight() {
-                              Toast.makeText(MainControllerActivity.this, "right", Toast.LENGTH_SHORT).show();
-                              if(playerNode.getWorldPosition().equals(leftNode.getWorldPosition()))
-                                playerMove(leftNode,centerNode);
-                              else if(playerNode.getWorldPosition().equals(centerNode.getWorldPosition()))
-                                  playerMove(centerNode,rightNode);
+                              if(position == 1)
+                              {
+                                  position = 2;
+                                  playerMove(leftNode,centerNode);
+                              }
+                              else if(position == 2) {
+                                  position = 3;
+                                  playerMove(centerNode, rightNode);
+                              }
                           }
                           public void onSwipeLeft() {
-                              Toast.makeText(MainControllerActivity.this, "left", Toast.LENGTH_SHORT).show();
-                              if(playerNode.getWorldPosition().equals(rightNode.getWorldPosition()))
+                              if(position == 3)
+                              {
+                                  position = 2;
                                   playerMove(rightNode,centerNode);
-                              else if(playerNode.getWorldPosition().equals(centerNode.getWorldPosition()))
+                              }
+                              else if(position == 2){
+                                  position = 1;
                                   playerMove(centerNode,leftNode);
+                              }
                           }
 //                          public void onSwipeTop() {
 //                              Toast.makeText(MainControllerActivity.this, "top", Toast.LENGTH_SHORT).show();
@@ -254,7 +270,7 @@ public class MainControllerActivity extends AppCompatActivity {
       st2.setParent(planetsSetNode);
       st3.setParent(planetsSetNode);
 
-      planetsSetNode.setLocalScale(new Vector3(0.5f,0.5f,0.5f));
+      planetsSetNode.setLocalScale(scale);
 
       Random rand = new Random();
       int r = rand.nextInt(3);
