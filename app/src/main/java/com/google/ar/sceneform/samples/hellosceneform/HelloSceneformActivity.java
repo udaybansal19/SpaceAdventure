@@ -15,6 +15,7 @@
  */
 package com.google.ar.sceneform.samples.hellosceneform;
 
+
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -33,6 +34,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
@@ -58,6 +60,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.*;
 import java.util.TimerTask;
+
 
 /**
  * This is an example activity that uses the Sceneform UX package to make common AR tasks easier.
@@ -130,7 +133,6 @@ public class HelloSceneformActivity extends AppCompatActivity {
                       });
 
 
-
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                       if (andyRenderable == null || oneTimeFlag!=0) {
@@ -186,7 +188,24 @@ public class HelloSceneformActivity extends AppCompatActivity {
                                           node.setWorldRotation(rotationFromAToB);
                                       }
                               );
-                      arFragment.getArSceneView().getSession().getConfig().setPlaneFindingMode(Config.PlaneFindingMode.DISABLED);
+                      View.OnTouchListener onTouchListener = new OnSwipeTouchListener(HelloSceneformActivity.this) {
+                          public void onSwipeTop() {
+                              Toast.makeText(HelloSceneformActivity.this, "top", Toast.LENGTH_SHORT).show();
+                          }
+                          public void onSwipeRight() {
+                              Toast.makeText(HelloSceneformActivity.this, "right", Toast.LENGTH_SHORT).show();
+                          }
+                          public void onSwipeLeft() {
+                              Toast.makeText(HelloSceneformActivity.this, "left", Toast.LENGTH_SHORT).show();
+                          }
+                          public void onSwipeBottom() {
+                              Toast.makeText(HelloSceneformActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+                          }
+
+                      };
+
+                      arFragment.getArSceneView().setOnTouchListener(onTouchListener);
+
                       playerNode = endNode;
                       playerNode.setLocalScale(new Vector3(0.6f,0.6f,0.6f));
                       playerNode.setRenderable(playerRenderable);
@@ -316,6 +335,34 @@ public class HelloSceneformActivity extends AppCompatActivity {
                               return null;
                           });
       }
+
+//    class MyGestureDetector extends SimpleOnGestureListener {
+//        private static final int SWIPE_MIN_DISTANCE = 120;
+//        private static final int SWIPE_MAX_OFF_PATH = 250;
+//        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+//        @Override
+//        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+//                               float velocityY) {
+//            try {
+//                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH){
+//                    return false;
+//                }
+//                // right to left swipe
+//                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
+//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+//                    //onLeftSwipe();
+//                }
+//                // left to right swipe
+//                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
+//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+//                    onRightSwipe();
+//                }
+//            } catch (Exception e) {
+//
+//            }
+//            return false;
+//        }
+//    }
 
 
   /**
