@@ -19,8 +19,6 @@ package com.google.ar.sceneform.samples.hellosceneform;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.TimeAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -28,18 +26,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Config;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
@@ -52,41 +46,33 @@ import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.core.Config;
-import com.google.ar.sceneform.ux.TransformableNode;
 
-import java.sql.Time;
 import java.util.Random;
-import java.util.Timer;
 import java.util.*;
-import java.util.TimerTask;
 
 
-/**
- * This is an example activity that uses the Sceneform UX package to make common AR tasks easier.
- */
-public class HelloSceneformActivity extends AppCompatActivity {
-  private static final String TAG = HelloSceneformActivity.class.getSimpleName();
+public class MainControllerActivity extends AppCompatActivity {
+  private static final String TAG = MainControllerActivity.class.getSimpleName();
   private static final double MIN_OPENGL_VERSION = 3.0;
 
   private ArFragment arFragment;
   private ModelRenderable andyRenderable;
   private ModelRenderable playerRenderable;
   ArrayList<ModelRenderable> spaceRenderable = new ArrayList<ModelRenderable>();
-  private  ModelRenderable highlight;
   private ObjectAnimator objectAnimation;
 
     private int oneTimeFlag = 0;
-    private AnchorNode prevAnchorNode;
+    private AnchorNode startNode;
     private AnchorNode endNode;
-    private Node playerNode;
+    private AnchorNode planetsSetNode;
+    private Node playerNode = new Node();
+    private Node rightNode = new Node();
+    private Node leftNode = new Node();
+    private Node centerNode = new Node();
     private Node andy;
-    private Node st,en,temp,temp2;
 
   @Override
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
-  // CompletableFuture requires api level 24
-  // FutureReturnValueIgnored is not valid
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
@@ -149,19 +135,20 @@ public class HelloSceneformActivity extends AppCompatActivity {
 //                andy.setParent(startNode);
 //                andy.setRenderable(andyRenderable);
                       // Create the end position and start the animation.
-                      Vector3 pos = new Vector3(1f, 5f, 10f);
-                      Node start = new Node();
-                      Node end = new Node();
-                      endNode.addChild(end);
+                      startNode = new AnchorNode();
+                      startNode.setParent(endNode);
+                      startNode.setLocalPosition(new Vector3(0f, 0f, -1f));
 
-                      start.setParent(end);
-                      start.setLocalPosition(new Vector3(0f, 0f, -1f));
-                      st = start;
-                      en = end;
+                      centerNode.setParent(endNode);
+                      rightNode.setParent(endNode);
+                      leftNode.setParent(endNode);
+
+                      rightNode.setLocalPosition(new Vector3(0.6f,0f,0f));
+                      leftNode.setLocalPosition(new Vector3(-0.6f,0f,0f));
 
                       Vector3 point1, point2;
-                      point1 = start.getWorldPosition();
-                      point2 = end.getWorldPosition();
+                      point1 = startNode.getWorldPosition();
+                      point2 = endNode.getWorldPosition();
 
     /*
         First, find the vector extending between the two points and define a look rotation
@@ -188,27 +175,39 @@ public class HelloSceneformActivity extends AppCompatActivity {
                                           node.setWorldRotation(rotationFromAToB);
                                       }
                               );
-                      View.OnTouchListener onTouchListener = new OnSwipeTouchListener(HelloSceneformActivity.this) {
-                          public void onSwipeTop() {
-                              Toast.makeText(HelloSceneformActivity.this, "top", Toast.LENGTH_SHORT).show();
-                          }
+
+                      playerNode.setParent(endNode);
+                      playerNode.setLocalScale(new Vector3(0.5f,0.5f,0.5f));
+                      playerNode.setRenderable(playerRenderable);
+
+                      //Move player ship
+                      View.OnTouchListener onTouchListener = new OnSwipeTouchListener(MainControllerActivity.this) {
                           public void onSwipeRight() {
-                              Toast.makeText(HelloSceneformActivity.this, "right", Toast.LENGTH_SHORT).show();
+                              Toast.makeText(MainControllerActivity.this, "right", Toast.LENGTH_SHORT).show();
+                              if(playerNode.getWorldPosition().equals(leftNode.getWorldPosition()))
+                                playerMove(leftNode,centerNode);
+                              else if(playerNode.getWorldPosition().equals(centerNode.getWorldPosition()))
+                                  playerMove(centerNode,rightNode);
                           }
                           public void onSwipeLeft() {
-                              Toast.makeText(HelloSceneformActivity.this, "left", Toast.LENGTH_SHORT).show();
+                              Toast.makeText(MainControllerActivity.this, "left", Toast.LENGTH_SHORT).show();
+                              if(playerNode.getWorldPosition().equals(rightNode.getWorldPosition()))
+                                  playerMove(rightNode,centerNode);
+                              else if(playerNode.getWorldPosition().equals(centerNode.getWorldPosition()))
+                                  playerMove(centerNode,leftNode);
                           }
-                          public void onSwipeBottom() {
-                              Toast.makeText(HelloSceneformActivity.this, "bottom", Toast.LENGTH_SHORT).show();
-                          }
+//                          public void onSwipeTop() {
+//                              Toast.makeText(MainControllerActivity.this, "top", Toast.LENGTH_SHORT).show();
+//                          }
+//                          public void onSwipeBottom() {
+//                              Toast.makeText(MainControllerActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+//                          }
 
                       };
 
                       arFragment.getArSceneView().setOnTouchListener(onTouchListener);
 
-                      playerNode = endNode;
-                      playerNode.setLocalScale(new Vector3(0.6f,0.6f,0.6f));
-                      playerNode.setRenderable(playerRenderable);
+
                       allPlanetsMove();
                   });
 
@@ -225,7 +224,7 @@ public class HelloSceneformActivity extends AppCompatActivity {
 
           @Override
           public void onAnimationEnd(Animator animation) {
-              temp.setParent(null);
+              planetsSetNode.setParent(null);
               allPlanetsMove();
 
           }
@@ -243,20 +242,19 @@ public class HelloSceneformActivity extends AppCompatActivity {
   }
 
   private Node planetsSet(){
-      Node start = new Node();
-      start.setParent(en);
-      start.setLocalPosition(new Vector3(0f,0f,-1f));
-      temp = start;
+      planetsSetNode = new AnchorNode();
+      planetsSetNode.setParent(endNode);
+      planetsSetNode.setLocalPosition(new Vector3(0f,0f,-1f));
 
       Node st1 = new Node();
       Node st2 = new Node();
       Node st3 = new Node();
 
-      st1.setParent(temp);
-      st2.setParent(temp);
-      st3.setParent(temp);
+      st1.setParent(planetsSetNode);
+      st2.setParent(planetsSetNode);
+      st3.setParent(planetsSetNode);
 
-      temp.setLocalScale(new Vector3(0.5f,0.5f,0.5f));
+      planetsSetNode.setLocalScale(new Vector3(0.5f,0.5f,0.5f));
 
       Random rand = new Random();
       int r = rand.nextInt(3);
@@ -286,7 +284,7 @@ public class HelloSceneformActivity extends AppCompatActivity {
               st3.setRenderable(m1);
 
 
-      return temp;
+      return planetsSetNode;
   }
 
   private ObjectAnimator planetsMove(){
@@ -298,7 +296,7 @@ public class HelloSceneformActivity extends AppCompatActivity {
 
       // All the positions should be world positions
       // The first position is the start, and the second is the end.
-      objectAnimation.setObjectValues(temp.getWorldPosition(), en.getWorldPosition());
+      objectAnimation.setObjectValues(planetsSetNode.getWorldPosition(), endNode.getWorldPosition());
 
       // Use setWorldPosition to position andy.
       objectAnimation.setPropertyName("worldPosition");
@@ -315,54 +313,51 @@ public class HelloSceneformActivity extends AppCompatActivity {
       return objectAnimation;
     }
 
-    private ModelRenderable randomObj(){
-        Random rand = new Random();
-        int r = rand.nextInt(1000);
-        return spaceRenderable.get(r%spaceRenderable.size());
-    }
+  private ObjectAnimator playerMove(Node from,Node moveTo){
 
-    private void modelRender(String arg,int i){
-          ModelRenderable.builder()
-                  .setSource(this, Uri.parse(arg))
-                  .build()
-                  .thenAccept(renderable -> spaceRenderable.add(renderable))
-                  .exceptionally(
-                          throwable -> {
-                              Toast toast =
-                                      Toast.makeText(this, "Unable to load " + arg, Toast.LENGTH_LONG);
-                              toast.setGravity(Gravity.CENTER, 0, 0);
-                              toast.show();
-                              return null;
-                          });
-      }
+    objectAnimation = new ObjectAnimator();
+    objectAnimation.setTarget(playerNode);
 
-//    class MyGestureDetector extends SimpleOnGestureListener {
-//        private static final int SWIPE_MIN_DISTANCE = 120;
-//        private static final int SWIPE_MAX_OFF_PATH = 250;
-//        private static final int SWIPE_THRESHOLD_VELOCITY = 200;
-//        @Override
-//        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-//                               float velocityY) {
-//            try {
-//                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH){
-//                    return false;
-//                }
-//                // right to left swipe
-//                if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    //onLeftSwipe();
-//                }
-//                // left to right swipe
-//                else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE
-//                        && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
-//                    onRightSwipe();
-//                }
-//            } catch (Exception e) {
-//
-//            }
-//            return false;
-//        }
-//    }
+    // All the positions should be world positions
+    // The first position is the start, and the second is the end.
+    objectAnimation.setObjectValues(from.getWorldPosition(),moveTo.getWorldPosition());
+
+    // Use setWorldPosition to position andy.
+    objectAnimation.setPropertyName("worldPosition");
+
+    // The Vector3Evaluator is used to evaluator 2 vector3 and return the next
+    // vector3.  The default is to use lerp.
+    objectAnimation.setEvaluator(new Vector3Evaluator());
+    // This makes the animation linear (smooth and uniform).
+    objectAnimation.setInterpolator(new LinearInterpolator());
+    // Duration in ms of the animation.
+    objectAnimation.setDuration(250);
+    //objectAnimation.setRepeatCount(Animation.INFINITE);
+      objectAnimation.start();
+
+    return objectAnimation;
+  }
+
+  private ModelRenderable randomObj(){
+    Random rand = new Random();
+    int r = rand.nextInt(1000);
+    return spaceRenderable.get(r%spaceRenderable.size());
+  }
+
+  private void modelRender(String arg,int i){
+      ModelRenderable.builder()
+              .setSource(this, Uri.parse(arg))
+              .build()
+              .thenAccept(renderable -> spaceRenderable.add(renderable))
+              .exceptionally(
+                      throwable -> {
+                          Toast toast =
+                                  Toast.makeText(this, "Unable to load " + arg, Toast.LENGTH_LONG);
+                          toast.setGravity(Gravity.CENTER, 0, 0);
+                          toast.show();
+                          return null;
+                      });
+  }
 
 
   /**
