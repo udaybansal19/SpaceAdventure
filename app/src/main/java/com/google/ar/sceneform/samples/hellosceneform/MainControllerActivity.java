@@ -19,6 +19,7 @@ package com.google.ar.sceneform.samples.hellosceneform;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.TimeAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -28,6 +29,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -191,15 +193,35 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       arFragment.getArSceneView().setOnTouchListener(onTouchListener);
 
+                      Toast toast =
+                              Toast.makeText(this, "Flag", Toast.LENGTH_LONG);
+                      toast.setGravity(Gravity.CENTER, 0, 0);
+                      toast.show();
 
-                      allPlanetsMove();
+                      TimeAnimator animator = new TimeAnimator();
+                      animator.setTimeListener(new TimeAnimator.TimeListener() {
+                          @Override
+                          public void onTimeUpdate(TimeAnimator a, long total, long dt){
+                              // total = millis since animation started
+                              // dt = millis since last update
+                              if(total%1000<=20)
+                              updatePlanets(dt,total);
+
+                          }
+                      });
+
+                      animator.start();
+
+
+                      //allPlanetsMove();
                   });
 
   }
 
   private void allPlanetsMove(){
+
       AnimatorSet s = new AnimatorSet();
-      s.play(planetsMove());
+      s.play(planetsMove().first);
       s.addListener(new Animator.AnimatorListener() {
           @Override
           public void onAnimationStart(Animator animation) {
@@ -208,7 +230,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
           @Override
           public void onAnimationEnd(Animator animation) {
-              planetsSetNode.setParent(null);
+             // planetsSetNode.setParent(null);
               allPlanetsMove();
 
           }
@@ -271,16 +293,44 @@ public class MainControllerActivity extends AppCompatActivity {
       return planetsSetNode;
   }
 
-  private ObjectAnimator planetsMove(){
+  private void updatePlanets(long dt,long total) {
+      AnimatorSet s = new AnimatorSet();
+      s.play(planetsMove().first);
+      s.addListener(new Animator.AnimatorListener() {
+          @Override
+          public void onAnimationStart(Animator animation) {
+              //endNode.setParent(null);
+          }
+
+          @Override
+          public void onAnimationEnd(Animator animation) {
+              //planetsSetNode.setParent(null);
+
+          }
+
+          @Override
+          public void onAnimationCancel(Animator animation) {
+
+          }
+
+          @Override
+          public void onAnimationRepeat(Animator animation) {
+          }
+      });
+      s.start();
+  }
+
+  private Pair<ObjectAnimator, Node> planetsMove(){
 
       // planetsAnimation(temp);
 
+      Node n = planetsSet();
       objectAnimation = new ObjectAnimator();
-      objectAnimation.setTarget(planetsSet());
+      objectAnimation.setTarget(n);
 
       // All the positions should be world positions
       // The first position is the start, and the second is the end.
-      objectAnimation.setObjectValues(planetsSetNode.getWorldPosition(), endNode.getWorldPosition());
+      objectAnimation.setObjectValues(startNode.getWorldPosition(), endNode.getWorldPosition());
 
       // Use setWorldPosition to position andy.
       objectAnimation.setPropertyName("worldPosition");
@@ -291,10 +341,9 @@ public class MainControllerActivity extends AppCompatActivity {
       // This makes the animation linear (smooth and uniform).
       objectAnimation.setInterpolator(new LinearInterpolator());
       // Duration in ms of the animation.
-      objectAnimation.setDuration(1500);
+      objectAnimation.setDuration(2000);
       //objectAnimation.setRepeatCount(Animation.INFINITE);
-
-      return objectAnimation;
+      return new Pair<ObjectAnimator, Node>(objectAnimation, n);
     }
 
   private ObjectAnimator playerMove(Node from,Node moveTo){
