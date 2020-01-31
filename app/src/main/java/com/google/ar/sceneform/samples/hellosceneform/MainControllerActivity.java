@@ -78,7 +78,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private int i = 0;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
-    private Vector3 startNodePosition = new Vector3(0f,0f,-1f);
+    private Vector3 startNodePosition = new Vector3(0f,0f,-1.5f);
     private Vector3 rightNodePosition = new Vector3(0.6f,0f,0f);
     private Vector3 leftNodePosition = new Vector3(-0.6f,0f,0f);
     private Vector3 centerNodePosition = new Vector3(0f,0f,0f);
@@ -203,11 +203,9 @@ public class MainControllerActivity extends AppCompatActivity {
                           public void onTimeUpdate(TimeAnimator a, long total, long dt){
                               // total = millis since animation started
                               // dt = millis since last update
-                              if(total/1000==i)
+                              if(total/750==i)
                               {
                                   updatePlanets();
-                                  i++;
-                                  i++;
                                   i++;
                               }
 
