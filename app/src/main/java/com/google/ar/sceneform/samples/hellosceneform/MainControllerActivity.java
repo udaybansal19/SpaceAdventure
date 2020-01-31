@@ -67,13 +67,15 @@ public class MainControllerActivity extends AppCompatActivity {
     private int position = 2;
     private AnchorNode startNode;
     private AnchorNode endNode;
-    private AnchorNode planetsSetNode;
+    private Queue<AnchorNode> planetsSetQueue = new LinkedList<>();
     private Node playerNode = new Node();
     private Node playerPositionNode = new Node();
     private Node rightNode = new Node();
     private Node leftNode = new Node();
     private Node centerNode = new Node();
     private Node andy;
+    private Context con;
+    private int i = 0;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
     private Vector3 startNodePosition = new Vector3(0f,0f,-1f);
@@ -193,10 +195,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       arFragment.getArSceneView().setOnTouchListener(onTouchListener);
 
-                      Toast toast =
-                              Toast.makeText(this, "Flag", Toast.LENGTH_LONG);
-                      toast.setGravity(Gravity.CENTER, 0, 0);
-                      toast.show();
+                      con = this;
 
                       TimeAnimator animator = new TimeAnimator();
                       animator.setTimeListener(new TimeAnimator.TimeListener() {
@@ -204,8 +203,13 @@ public class MainControllerActivity extends AppCompatActivity {
                           public void onTimeUpdate(TimeAnimator a, long total, long dt){
                               // total = millis since animation started
                               // dt = millis since last update
-                              if(total%1000<=20)
-                              updatePlanets(dt,total);
+                              if(total/1000==i)
+                              {
+                                  updatePlanets();
+                                  i++;
+                                  i++;
+                                  i++;
+                              }
 
                           }
                       });
@@ -248,9 +252,9 @@ public class MainControllerActivity extends AppCompatActivity {
   }
 
   private Node planetsSet(){
-      planetsSetNode = new AnchorNode();
+      AnchorNode planetsSetNode = new AnchorNode();
       planetsSetNode.setParent(endNode);
-      planetsSetNode.setLocalPosition(startNodePosition);
+      planetsSetNode.setWorldPosition(startNodePosition);
 
       Node st1 = new Node();
       Node st2 = new Node();
@@ -263,7 +267,7 @@ public class MainControllerActivity extends AppCompatActivity {
       planetsSetNode.setLocalScale(scale);
 
       Random rand = new Random();
-      int r = rand.nextInt(3);
+      int r = rand.nextInt(1000);
 
 
       st1.setLocalPosition(rightNodePosition);
@@ -283,17 +287,17 @@ public class MainControllerActivity extends AppCompatActivity {
           if (r % 3 != 1)
           {
               st2.setRenderable(m1);
-              if(r==0)
+              if( r % 3 == 0)
                   m1=m2;
           }
           if (r % 3 != 2)
               st3.setRenderable(m1);
 
-
+          planetsSetQueue.add(planetsSetNode);
       return planetsSetNode;
   }
 
-  private void updatePlanets(long dt,long total) {
+  private void updatePlanets() {
       AnimatorSet s = new AnimatorSet();
       s.play(planetsMove().first);
       s.addListener(new Animator.AnimatorListener() {
@@ -305,7 +309,8 @@ public class MainControllerActivity extends AppCompatActivity {
           @Override
           public void onAnimationEnd(Animator animation) {
               //planetsSetNode.setParent(null);
-
+              planetsSetQueue.peek().setParent(null);
+              planetsSetQueue.remove();
           }
 
           @Override
@@ -325,6 +330,7 @@ public class MainControllerActivity extends AppCompatActivity {
       // planetsAnimation(temp);
 
       Node n = planetsSet();
+      n.setParent(endNode);
       objectAnimation = new ObjectAnimator();
       objectAnimation.setTarget(n);
 
