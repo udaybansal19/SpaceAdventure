@@ -40,6 +40,8 @@ import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.collision.CollisionShape;
+import com.google.ar.sceneform.collision.Sphere;
 import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
@@ -76,6 +78,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private Node andy;
     private Context con;
     private int i = 0;
+    private CollisionShape sp = new Sphere(0.4f);
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
     private Vector3 startNodePosition = new Vector3(0f,0f,-1.5f);
@@ -158,10 +161,14 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       playerNode.setParent(endNode);
                       playerNode.setLocalScale(scale);
+                      playerNode.setCollisionShape(sp);
                       playerNode.setRenderable(playerRenderable);
 
                       //Move player ship
                       View.OnTouchListener onTouchListener = new OnSwipeTouchListener(MainControllerActivity.this) {
+
+
+
                           public void onSwipeRight() {
                               if(position == 1)
                               {
@@ -184,6 +191,7 @@ public class MainControllerActivity extends AppCompatActivity {
                                   playerMove(centerNode,leftNode);
                               }
                           }
+
 //                          public void onSwipeTop() {
 //                              Toast.makeText(MainControllerActivity.this, "top", Toast.LENGTH_SHORT).show();
 //                          }
@@ -217,8 +225,16 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       //allPlanetsMove();
                   });
-
   }
+
+    private void collisionDetect(){
+        if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
+            Toast toast =
+                    Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+        }
+    }
 
   private void allPlanetsMove(){
 
@@ -280,16 +296,21 @@ public class MainControllerActivity extends AppCompatActivity {
           if (r % 3 != 0)
           {
               st1.setRenderable(m1);
+              st1.setCollisionShape(sp);
               m1=m2;
           }
           if (r % 3 != 1)
           {
               st2.setRenderable(m1);
+              st2.setCollisionShape(sp);
               if( r % 3 == 0)
                   m1=m2;
           }
           if (r % 3 != 2)
+          {
               st3.setRenderable(m1);
+              st3.setCollisionShape(sp);
+          }
 
           planetsSetQueue.add(planetsSetNode);
       return planetsSetNode;
@@ -327,6 +348,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
       // planetsAnimation(temp);
 
+      collisionDetect();
       Node n = planetsSet();
       n.setParent(endNode);
       objectAnimation = new ObjectAnimator();
