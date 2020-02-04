@@ -33,7 +33,10 @@ import android.util.Pair;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
@@ -133,12 +136,14 @@ public class MainControllerActivity extends AppCompatActivity {
                           return null;
                       });
 
+      TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
 
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                       if (andyRenderable == null || oneTimeFlag!=0) {
                           return;
                       }
+
                       oneTimeFlag++;
                       Anchor anchor = hitResult.createAnchor();
                       endNode = new AnchorNode(anchor);
