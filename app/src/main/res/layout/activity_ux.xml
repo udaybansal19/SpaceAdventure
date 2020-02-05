@@ -26,31 +26,32 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/playButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:background="#3A9DF3"
-        android:textColor="@android:color/background_light"
-        android:visibility="gone"
-        tools:text="PLAY" />
+  <android.support.v7.widget.AppCompatButton
+      android:id="@+id/playButton"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:background="@null"
+      android:textColor="@android:color/black"
+      android:textSize="24sp"
+      android:visibility="gone"
+      tools:text="PLAY" />
 
   <TextView
       android:id="@+id/initialInstruc"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Find a Surface to play"
+      android:text="@string/initialInstruc"
       android:gravity="center"
       android:layout_gravity="center"
       android:visibility="visible"/>
 
-    <ImageButton
-        android:id="@+id/restartButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/restart"
-        android:visibility="gone"/>
+<!--    <ImageButton-->
+<!--        android:id="@+id/restartButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:srcCompat="@drawable/restart"-->
+<!--        android:visibility="gone"/>-->
 
 <!--    <TextView-->
 <!--        android:id="@+id/score"-->

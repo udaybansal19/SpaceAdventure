@@ -16,4 +16,5 @@
 -->
 <resources>
     <string name="app_name">SpaceAttac</string>
+    <string name="initialInstruc">Find a Surface to play</string>
 </resources>

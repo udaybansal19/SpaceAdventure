@@ -86,8 +86,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private int counterUpdatePlanets = 0;
     private CollisionShape sp = new Sphere(0.4f);
     private TimeAnimator planetsMove;
-    private ImageButton restartButton = findViewById(R.id.restartButton);
-    private TextView scoreView = findViewById(R.id.score);
+    private TextView scoreView;
     private int score = 0;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
@@ -145,6 +144,8 @@ public class MainControllerActivity extends AppCompatActivity {
 
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
       Button playButton = findViewById(R.id.playButton);
+      //ImageButton restartButton = findViewById(R.id.restartButton);
+      scoreView = findViewById(R.id.score);
 
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -220,7 +221,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       con = this;
 
-                      planetsMove = allPlanetsMove();
+                     planetsMove = allPlanetsMove();
 
                       playButton.setOnClickListener(new View.OnClickListener (){
                           public void onClick(View v) {
@@ -250,7 +251,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private void collisionDetect(){
         if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
             planetsMove.end();
-            restartButton.setVisibility(View.VISIBLE);
+            //restartButton.setVisibility(View.VISIBLE);
             Toast toast =
                     Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
@@ -342,8 +343,8 @@ public class MainControllerActivity extends AppCompatActivity {
           @Override
           public void onAnimationEnd(Animator animation) {
               //planetsSetNode.setParent(null);
-              score++;
-              scoreView.setText(score);
+              //score++;
+              //scoreView.setText(score);
               planetsSetQueue.peek().setParent(null);
               planetsSetQueue.remove();
           }
