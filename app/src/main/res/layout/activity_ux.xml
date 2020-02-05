@@ -14,6 +14,7 @@
    limitations under the License.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
@@ -25,19 +26,54 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent" />
 
-  <android.support.v7.widget.AppCompatButton
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:visibility="gone"/>
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#3A9DF3"
+        android:textColor="@android:color/background_light"
+        android:visibility="gone"
+        tools:text="PLAY" />
 
   <TextView
       android:id="@+id/initialInstruc"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="Find a Surface to play"
+      android:gravity="center"
       android:layout_gravity="center"
       android:visibility="visible"/>
+
+    <ImageButton
+        android:id="@+id/restartButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/restart"
+        android:visibility="gone"/>
+
+<!--    <TextView-->
+<!--        android:id="@+id/score"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="right"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="10dp"-->
+<!--        android:text="0000"-->
+<!--        android:textSize="24sp" />-->
+
+    <EditText
+        android:id="@+id/score"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:ems="10"
+        android:gravity="right"
+        android:inputType="number"
+        android:text="0000"
+        android:textSize="24sp" />
 
 
 </FrameLayout>

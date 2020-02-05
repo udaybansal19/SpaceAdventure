@@ -23,6 +23,7 @@ import android.animation.TimeAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
@@ -36,6 +37,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.ar.core.Anchor;
@@ -80,8 +83,12 @@ public class MainControllerActivity extends AppCompatActivity {
     private Node centerNode = new Node();
     private Node andy;
     private Context con;
-    private int i = 0;
+    private int counterUpdatePlanets = 0;
     private CollisionShape sp = new Sphere(0.4f);
+    private TimeAnimator planetsMove;
+    private ImageButton restartButton = findViewById(R.id.restartButton);
+    private TextView scoreView = findViewById(R.id.score);
+    private int score = 0;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
     private Vector3 startNodePosition = new Vector3(0f,0f,-1.5f);
@@ -137,12 +144,15 @@ public class MainControllerActivity extends AppCompatActivity {
                       });
 
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
+      Button playButton = findViewById(R.id.playButton);
 
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
                       if (andyRenderable == null || oneTimeFlag!=0) {
                           return;
                       }
+                      initialInstuc.setVisibility(View.INVISIBLE);
+                      playButton.setVisibility(View.VISIBLE);
 
                       oneTimeFlag++;
                       Anchor anchor = hitResult.createAnchor();
@@ -210,30 +220,37 @@ public class MainControllerActivity extends AppCompatActivity {
 
                       con = this;
 
-                      TimeAnimator animator = new TimeAnimator();
-                      animator.setTimeListener(new TimeAnimator.TimeListener() {
-                          @Override
-                          public void onTimeUpdate(TimeAnimator a, long total, long dt){
-                              // total = millis since animation started
-                              // dt = millis since last update
-                              if(total/750==i)
-                              {
-                                  updatePlanets();
-                                  i++;
-                              }
+                      planetsMove = allPlanetsMove();
 
+                      playButton.setOnClickListener(new View.OnClickListener (){
+                          public void onClick(View v) {
+                              // Do something in response to button click
+                              planetsMove.start();
+                              playButton.setVisibility(View.GONE);
                           }
                       });
 
-                      animator.start();
+//                      restartButton.setOnClickListener(new View.OnClickListener() {
+//                          @Override
+//                          public void onClick(View v) {
+//                              restartButton.setVisibility(View.INVISIBLE);
+//                              score = 0;
+//                              scoreView.setText(score);
+//                              planetsMove = allPlanetsMove();
+//
+//                          }
+//                      });
 
 
                       //allPlanetsMove();
                   });
+
   }
 
     private void collisionDetect(){
         if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
+            planetsMove.end();
+            restartButton.setVisibility(View.VISIBLE);
             Toast toast =
                     Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
@@ -241,33 +258,25 @@ public class MainControllerActivity extends AppCompatActivity {
         }
     }
 
-  private void allPlanetsMove(){
+  private TimeAnimator allPlanetsMove(){
 
-      AnimatorSet s = new AnimatorSet();
-      s.play(planetsMove().first);
-      s.addListener(new Animator.AnimatorListener() {
+      TimeAnimator animator = new TimeAnimator();
+      animator.setTimeListener(new TimeAnimator.TimeListener() {
           @Override
-          public void onAnimationStart(Animator animation) {
-              //endNode.setParent(null);
-          }
+          public void onTimeUpdate(TimeAnimator a, long total, long dt){
+              // total = millis since animation started
+              // dt = millis since last update
+              if(total/750==counterUpdatePlanets)
+              {
+                  updatePlanets();
+                  counterUpdatePlanets++;
+              }
 
-          @Override
-          public void onAnimationEnd(Animator animation) {
-             // planetsSetNode.setParent(null);
-              allPlanetsMove();
-
-          }
-
-          @Override
-          public void onAnimationCancel(Animator animation) {
-
-          }
-
-          @Override
-          public void onAnimationRepeat(Animator animation) {
           }
       });
-      s.start();
+
+      return animator;
+
   }
 
   private Node planetsSet(){
@@ -321,7 +330,7 @@ public class MainControllerActivity extends AppCompatActivity {
       return planetsSetNode;
   }
 
-  private void updatePlanets() {
+  private AnimatorSet updatePlanets() {
       AnimatorSet s = new AnimatorSet();
       s.play(planetsMove().first);
       s.addListener(new Animator.AnimatorListener() {
@@ -333,6 +342,8 @@ public class MainControllerActivity extends AppCompatActivity {
           @Override
           public void onAnimationEnd(Animator animation) {
               //planetsSetNode.setParent(null);
+              score++;
+              scoreView.setText(score);
               planetsSetQueue.peek().setParent(null);
               planetsSetQueue.remove();
           }
@@ -347,6 +358,7 @@ public class MainControllerActivity extends AppCompatActivity {
           }
       });
       s.start();
+      return s;
   }
 
   private Pair<ObjectAnimator, Node> planetsMove(){
