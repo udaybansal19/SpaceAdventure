@@ -84,13 +84,14 @@ public class MainControllerActivity extends AppCompatActivity {
     private Node andy;
     private Context con;
     private int counterUpdatePlanets = 0;
-    private CollisionShape sp = new Sphere(0.4f);
+    private CollisionShape sp = new Sphere(0.5f);
     private TimeAnimator planetsMove;
     private TextView scoreView;
+    private ImageButton restartButton;
     private int score = 0;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
-    private Vector3 startNodePosition = new Vector3(0f,0f,-1.5f);
+    private Vector3 startNodePosition = new Vector3(0f,0f,-1.8f);
     private Vector3 rightNodePosition = new Vector3(0.6f,0f,0f);
     private Vector3 leftNodePosition = new Vector3(-0.6f,0f,0f);
     private Vector3 centerNodePosition = new Vector3(0f,0f,0f);
@@ -144,7 +145,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
       Button playButton = findViewById(R.id.playButton);
-      //ImageButton restartButton = findViewById(R.id.restartButton);
+      restartButton = findViewById(R.id.restartButton);
       scoreView = findViewById(R.id.score);
 
           arFragment.setOnTapArPlaneListener(
@@ -231,16 +232,17 @@ public class MainControllerActivity extends AppCompatActivity {
                           }
                       });
 
-//                      restartButton.setOnClickListener(new View.OnClickListener() {
-//                          @Override
-//                          public void onClick(View v) {
-//                              restartButton.setVisibility(View.INVISIBLE);
-//                              score = 0;
-//                              scoreView.setText(score);
-//                              planetsMove = allPlanetsMove();
-//
-//                          }
-//                      });
+                      restartButton.setOnClickListener(new View.OnClickListener() {
+                          @Override
+                          public void onClick(View v) {
+                              restartButton.setVisibility(View.INVISIBLE);
+                              score = 0;
+                              //scoreView.setText(score);
+                              planetsMove = allPlanetsMove();
+                              planetsMove.start();
+
+                          }
+                      });
 
 
                       //allPlanetsMove();
@@ -251,7 +253,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private void collisionDetect(){
         if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
             planetsMove.end();
-            //restartButton.setVisibility(View.VISIBLE);
+            restartButton.setVisibility(View.VISIBLE);
             Toast toast =
                     Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
             toast.setGravity(Gravity.CENTER, 0, 0);
@@ -344,7 +346,6 @@ public class MainControllerActivity extends AppCompatActivity {
           public void onAnimationEnd(Animator animation) {
               //planetsSetNode.setParent(null);
               //score++;
-              //scoreView.setText(score);
               planetsSetQueue.peek().setParent(null);
               planetsSetQueue.remove();
           }
