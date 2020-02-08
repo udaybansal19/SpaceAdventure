@@ -146,7 +146,7 @@ public class MainControllerActivity extends AppCompatActivity {
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
       Button playButton = findViewById(R.id.playButton);
       restartButton = findViewById(R.id.restartButton);
-      scoreView = findViewById(R.id.score);
+      scoreView = (TextView) findViewById(R.id.score);
 
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -345,7 +345,8 @@ public class MainControllerActivity extends AppCompatActivity {
           @Override
           public void onAnimationEnd(Animator animation) {
               //planetsSetNode.setParent(null);
-              //score++;
+              score++;
+              scoreView.setText("" + score);
               planetsSetQueue.peek().setParent(null);
               planetsSetQueue.remove();
           }
