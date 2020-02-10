@@ -53,6 +53,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@null"
+        android:minWidth="70dp"
+        android:minHeight="50dp"
         android:visibility="gone"
         app:srcCompat="@drawable/restart" />
 
@@ -68,17 +70,18 @@
         android:text="0000"
         android:textSize="24sp" />
 
-  <Button
-      android:id="@+id/playButton"
-      android:text="@string/play"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:background="@null"
-      android:textColor="@android:color/black"
-      android:textSize="24sp"
-      android:visibility="gone"
-       />
+    <Button
+        android:id="@+id/playButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@null"
+        android:maxWidth="80dp"
+        android:maxHeight="50dp"
+        android:text="@string/play"
+        android:textColor="@android:color/black"
+        android:textSize="24sp"
+        android:visibility="gone" />
 
 
 </FrameLayout>
