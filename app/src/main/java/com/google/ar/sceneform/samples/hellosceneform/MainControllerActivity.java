@@ -80,6 +80,7 @@ public class MainControllerActivity extends AppCompatActivity {
     private AnchorNode startNode;
     private AnchorNode endNode;
     private Queue<AnchorNode> planetsSetQueue = new LinkedList<>();
+    private Queue<ObjectAnimator> planetsAnimationQueue = new LinkedList<>();
     private Node playerNode = new Node();
     private Node playerPositionNode = new Node();
     private Node rightNode = new Node();
@@ -249,6 +250,11 @@ public class MainControllerActivity extends AppCompatActivity {
                               planetsMove = allPlanetsMove();
                               planetsMove.start();
                               counterUpdatePlanets = 0;
+                              for(AnchorNode anchorNode : planetsSetQueue){
+                                  anchorNode.setParent(null);
+                              }
+                              planetsSetQueue.clear();
+                              planetsAnimationQueue.clear();
 
                           }
                       });
@@ -315,7 +321,10 @@ public class MainControllerActivity extends AppCompatActivity {
                 planetsMove.end();
                 restartButton.setVisibility(View.VISIBLE);
                 //arFragment.getArSceneView().clearAnimation();
-                arFragment.getView().clearAnimation();
+                for(ObjectAnimator objectAnimator : planetsAnimationQueue){
+                    objectAnimator.pause();
+                }
+
 
                 Toast toast =
                         Toast.makeText(con, "Game Over " + arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size(), Toast.LENGTH_SHORT);
@@ -405,7 +414,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
   private AnimatorSet updatePlanets() {
       AnimatorSet s = new AnimatorSet();
-      s.play(planetsMove().first);
+      s.play(planetsMove());
       s.addListener(new Animator.AnimatorListener() {
           @Override
           public void onAnimationStart(Animator animation) {
@@ -419,6 +428,7 @@ public class MainControllerActivity extends AppCompatActivity {
               scoreView.setText("" + score);
               planetsSetQueue.peek().setParent(null);
               planetsSetQueue.remove();
+              planetsAnimationQueue.remove();
           }
 
           @Override
@@ -434,7 +444,7 @@ public class MainControllerActivity extends AppCompatActivity {
       return s;
   }
 
-  private Pair<ObjectAnimator, Node> planetsMove(){
+  private ObjectAnimator planetsMove(){
 
       // planetsAnimation(temp);
 
@@ -459,7 +469,8 @@ public class MainControllerActivity extends AppCompatActivity {
       // Duration in ms of the animation.
       objectAnimation.setDuration(2500);
       //objectAnimation.setRepeatCount(Animation.INFINITE);
-      return new Pair<ObjectAnimator, Node>(objectAnimation, n);
+      planetsAnimationQueue.add(objectAnimation);
+      return objectAnimation;
     }
 
   private ObjectAnimator playerMove(Node from,Node moveTo){
