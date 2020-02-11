@@ -451,9 +451,7 @@ public class MainControllerActivity extends AppCompatActivity {
       s.start();
       else
       {
-          for(ObjectAnimator objectAnimator: planetsAnimationQueue){
-              objectAnimator.pause();
-          }
+
       }
       return s;
   }
@@ -481,7 +479,7 @@ public class MainControllerActivity extends AppCompatActivity {
       objectAnimation.setDuration(2500);
       //objectAnimation.setRepeatCount(Animation.INFINITE);
       planetsAnimationQueue.add(objectAnimation);
-      collisionDetect();
+      //collisionDetect();
       return objectAnimation;
     }
 
