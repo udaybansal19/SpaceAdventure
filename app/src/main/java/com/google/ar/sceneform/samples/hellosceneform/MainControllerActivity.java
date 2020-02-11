@@ -301,7 +301,7 @@ public class MainControllerActivity extends AppCompatActivity {
         }
     }
 
-    private void collisionDetect(){
+    private boolean collisionDetect(){
       boolean fla = false;
         if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
             fla=true;
@@ -324,14 +324,21 @@ public class MainControllerActivity extends AppCompatActivity {
                 for(ObjectAnimator objectAnimator : planetsAnimationQueue){
                     objectAnimator.pause();
                 }
+                for(AnchorNode anchorNode : planetsSetQueue){
+                    Toast toast =
+                            Toast.makeText(con, ""+ anchorNode.getLocalPosition(), Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
 
 
                 Toast toast =
-                        Toast.makeText(con, "Game Over " + arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size(), Toast.LENGTH_SHORT);
+                        Toast.makeText(con, "Game Over " + planetsSetQueue.size() + " " + planetsAnimationQueue.size(), Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
         }
+        return fla;
     }
 
   private TimeAnimator allPlanetsMove(){
@@ -440,15 +447,19 @@ public class MainControllerActivity extends AppCompatActivity {
           public void onAnimationRepeat(Animator animation) {
           }
       });
+      if(!collisionDetect())
       s.start();
+      else
+      {
+          for(ObjectAnimator objectAnimator: planetsAnimationQueue){
+              objectAnimator.pause();
+          }
+      }
       return s;
   }
 
   private ObjectAnimator planetsMove(){
 
-      // planetsAnimation(temp);
-
-      collisionDetect();
       Node n = planetsSet();
       n.setParent(endNode);
       objectAnimation = new ObjectAnimator();
@@ -470,6 +481,7 @@ public class MainControllerActivity extends AppCompatActivity {
       objectAnimation.setDuration(2500);
       //objectAnimation.setRepeatCount(Animation.INFINITE);
       planetsAnimationQueue.add(objectAnimation);
+      collisionDetect();
       return objectAnimation;
     }
 
