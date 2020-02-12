@@ -56,20 +56,25 @@
 
         <ImageButton
             android:id="@+id/restartButton"
-            style="@android:style/Widget.Holo.Light.ImageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
             android:background="@null"
-            android:minWidth="70dp"
-            android:minHeight="50dp"
+            android:padding="20dp"
+            android:scaleType="fitCenter"
             app:srcCompat="@drawable/restart" />
 
         <TextView
             android:id="@+id/scoreViewGameEnd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Score: " />
+            android:textColor="@android:color/holo_orange_dark"
+            android:textSize="22sp" />
 
     </LinearLayout>
 

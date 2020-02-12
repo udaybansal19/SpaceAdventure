@@ -91,17 +91,19 @@ public class MainControllerActivity extends AppCompatActivity {
     private Node andy;
     private Context con;
     private int counterUpdatePlanets = 0;
-    private Box sp = new Box(new Vector3(0.5f,0.5f,0.5f));
-    private CollisionShape shape = new Box();
     private TimeAnimator planetsMove;
     private TextView scoreView;
+    private TextView scoreViewGameEnd;
     private LinearLayout gameEndLayout;
+    private ImageButton restartButton;
     private int score = 0;
     private int highScore = 0;
     private int setNumber = 1;
+    private int planetsMoveTime = 2100;
+    private int nextPlanetSetIn = 620;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
-    private Vector3 startNodePosition = new Vector3(0f,0f,-2f);
+    private Vector3 startNodePosition = new Vector3(0f,0f,-1.7f);
     private Vector3 rightNodePosition = new Vector3(0.6f,0f,0f);
     private Vector3 leftNodePosition = new Vector3(-0.6f,0f,0f);
     private Vector3 centerNodePosition = new Vector3(0f,0f,0f);
@@ -158,8 +160,10 @@ public class MainControllerActivity extends AppCompatActivity {
 
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
       Button playButton = findViewById(R.id.playButton);
+      restartButton = findViewById(R.id.restartButton);
       gameEndLayout = findViewById(R.id.gameEndLayout);
       scoreView = (TextView) findViewById(R.id.score);
+      scoreViewGameEnd = findViewById(R.id.scoreViewGameEnd);
 
           arFragment.setOnTapArPlaneListener(
                   (HitResult hitResult, Plane plane, MotionEvent motionEvent) -> {
@@ -185,16 +189,16 @@ public class MainControllerActivity extends AppCompatActivity {
                       leftNode.setParent(playerPositionNode);
 
                       playerPositionNode.setLocalScale(scale);
+//                      playerPositionNode.setLocalPosition(new Vector3(0f,0f,-0.1f));
 
                       rightNode.setLocalPosition(rightNodePosition);
                       leftNode.setLocalPosition(leftNodePosition);
 
                       playerNode.setParent(endNode);
                       playerNode.setLocalScale(scale);
-                      playerNode.setCollisionShape(sp);
-//                      //testModel(playerNode);
-//                      playerNode.setRenderable(playerRenderable);
-                      testModel(playerNode);
+                      playerNode.setCollisionShape(playerRenderable.getCollisionShape());
+                      playerNode.setRenderable(playerRenderable);
+//                      testModel(playerNode);
 
                       //Move player ship
                       View.OnTouchListener onTouchListener = new OnSwipeTouchListener(MainControllerActivity.this) {
@@ -247,7 +251,7 @@ public class MainControllerActivity extends AppCompatActivity {
                           }
                       });
 
-                      gameEndLayout.setOnClickListener(new View.OnClickListener() {
+                      restartButton.setOnClickListener(new View.OnClickListener() {
                           @Override
                           public void onClick(View v) {
 
@@ -293,21 +297,6 @@ public class MainControllerActivity extends AppCompatActivity {
   }
 
 
-    private void onUpdate(FrameTime frameTime) {
-        ArrayList<Node> overlappedNodes = arFragment.getArSceneView().getScene().overlapTestAll(playerNode);
-        if(overlappedNodes.size()!=0){
-            planetsMove.end();
-            gameEndLayout.setVisibility(View.VISIBLE);
-            //arFragment.getArSceneView().clearAnimation();
-            arFragment.getView().clearAnimation();
-
-            Toast toast =
-                    Toast.makeText(con, "----Game Over----", Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
-        }
-    }
-
     private boolean collisionDetect(){
       boolean fla = false;
         if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
@@ -317,10 +306,6 @@ public class MainControllerActivity extends AppCompatActivity {
                     fla=false;
                 else
                 {
-                    Toast toast =
-                            Toast.makeText(con, node1.getName() + "", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
                     fla=true;
                 }
             }
@@ -332,17 +317,18 @@ public class MainControllerActivity extends AppCompatActivity {
                     objectAnimator.pause();
                 }
 
-                SharedPreferences mPref = getSharedPreferences("highScore",0);
-                SharedPreferences.Editor mEditor = mPref.edit();
-                if(score > highScore)
-                mEditor.putInt("highScore",score).commit();
+                if(score > highScore){
+                    highScore = score;
+                    SharedPreferences mPref = getSharedPreferences("highScore",0);
+                    SharedPreferences.Editor mEditor = mPref.edit();
+                    mEditor.putInt("highScore",score).commit();
+                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+                }
                 else
-                {}
+                {
+                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+                }
 
-                Toast toast =
-                        Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
             }
         }
         return fla;
@@ -356,7 +342,7 @@ public class MainControllerActivity extends AppCompatActivity {
           public void onTimeUpdate(TimeAnimator a, long total, long dt){
               // total = millis since animation started
               // dt = millis since last update
-              if(total/750==counterUpdatePlanets)
+              if(total/nextPlanetSetIn==counterUpdatePlanets)
               {
                   updatePlanets();
                   counterUpdatePlanets++;
@@ -382,42 +368,39 @@ public class MainControllerActivity extends AppCompatActivity {
       int r = rand.nextInt(1000);
 
 
-      //ModelRenderable m1 = randomObj();
-      //ModelRenderable m2 = randomObj();
-      //while(m1==m2)
-      //    m2 = randomObj();
+      ModelRenderable m1 = randomObj();
+      ModelRenderable m2 = randomObj();
+      while(m1.equals(m2))
+          m2 = randomObj();
 
           if (r % 3 != 0)
           {
-              //st1.setRenderable(m1);
               Node st1 = new Node();
               st1.setParent(planetsSetNode);
               st1.setLocalPosition(rightNodePosition);
-              testModel(st1);
-              st1.setCollisionShape(sp);
+              st1.setRenderable(m1);
+              st1.setCollisionShape(m1.getCollisionShape());
               st1.setName("planetSet: " + setNumber + "PlanetNumber: " + 1 );
-              //m1=m2;
+              m1=m2;
           }
           if (r % 3 != 1)
           {
-              //st2.setRenderable(m1);
               Node st2 = new Node();
               st2.setParent(planetsSetNode);
               st2.setLocalPosition(centerNodePosition);
-              testModel(st2);
-              st2.setCollisionShape(sp);
+              st2.setRenderable(m1);
+              st2.setCollisionShape(m1.getCollisionShape());
               st2.setName("planetSet: " + setNumber + "PlanetNumber: " + 2 );
-              //if( r % 3 == 0)
-                 // m1=m2;
+              if( r % 3 == 0)
+                  m1=m2;
           }
           if (r % 3 != 2)
           {
-              //st3.setRenderable(m1);
               Node st3 = new Node();
               st3.setParent(planetsSetNode);
               st3.setLocalPosition(leftNodePosition);
-              testModel(st3);
-              st3.setCollisionShape(sp);
+              st3.setRenderable(m1);
+              st3.setCollisionShape(m1.getCollisionShape());
               st3.setName("planetSet: " + setNumber + "PlanetNumber: " + 3 );
           }
 
@@ -484,7 +467,7 @@ public class MainControllerActivity extends AppCompatActivity {
       // This makes the animation linear (smooth and uniform).
       objectAnimation.setInterpolator(new LinearInterpolator());
       // Duration in ms of the animation.
-      objectAnimation.setDuration(2500);
+      objectAnimation.setDuration(planetsMoveTime);
       //objectAnimation.setRepeatCount(Animation.INFINITE);
       planetsAnimationQueue.add(objectAnimation);
       //collisionDetect();
