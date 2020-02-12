@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
@@ -40,6 +41,7 @@ import android.view.ViewParent;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.ar.core.Anchor;
@@ -93,8 +95,9 @@ public class MainControllerActivity extends AppCompatActivity {
     private CollisionShape shape = new Box();
     private TimeAnimator planetsMove;
     private TextView scoreView;
-    private ImageButton restartButton;
+    private LinearLayout gameEndLayout;
     private int score = 0;
+    private int highScore = 0;
     private int setNumber = 1;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
@@ -114,6 +117,9 @@ public class MainControllerActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_ux);
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+
+      SharedPreferences mPref = getSharedPreferences("highScore",MODE_PRIVATE);
+      highScore = mPref.getInt("highScore",0);
 
     // When you build a Renderable, Sceneform loads its resources in the background while returning
     // a CompletableFuture. Call thenAccept(), handle(), or check isDone() before calling get().
@@ -152,7 +158,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
       TextView initialInstuc = (TextView) findViewById(R.id.initialInstruc);
       Button playButton = findViewById(R.id.playButton);
-      restartButton = findViewById(R.id.restartButton);
+      gameEndLayout = findViewById(R.id.gameEndLayout);
       scoreView = (TextView) findViewById(R.id.score);
 
           arFragment.setOnTapArPlaneListener(
@@ -241,10 +247,11 @@ public class MainControllerActivity extends AppCompatActivity {
                           }
                       });
 
-                      restartButton.setOnClickListener(new View.OnClickListener() {
+                      gameEndLayout.setOnClickListener(new View.OnClickListener() {
                           @Override
                           public void onClick(View v) {
-                              restartButton.setVisibility(View.INVISIBLE);
+
+                              gameEndLayout.setVisibility(View.INVISIBLE);
                               score = 0;
                               scoreView.setText("" + score);
                               planetsMove = allPlanetsMove();
@@ -290,7 +297,7 @@ public class MainControllerActivity extends AppCompatActivity {
         ArrayList<Node> overlappedNodes = arFragment.getArSceneView().getScene().overlapTestAll(playerNode);
         if(overlappedNodes.size()!=0){
             planetsMove.end();
-            restartButton.setVisibility(View.VISIBLE);
+            gameEndLayout.setVisibility(View.VISIBLE);
             //arFragment.getArSceneView().clearAnimation();
             arFragment.getView().clearAnimation();
 
@@ -319,21 +326,21 @@ public class MainControllerActivity extends AppCompatActivity {
             }
             if(fla) {
                 planetsMove.end();
-                restartButton.setVisibility(View.VISIBLE);
+                gameEndLayout.setVisibility(View.VISIBLE);
                 //arFragment.getArSceneView().clearAnimation();
                 for(ObjectAnimator objectAnimator : planetsAnimationQueue){
                     objectAnimator.pause();
                 }
-                for(AnchorNode anchorNode : planetsSetQueue){
-                    Toast toast =
-                            Toast.makeText(con, ""+ anchorNode.getLocalPosition(), Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
-                }
 
+                SharedPreferences mPref = getSharedPreferences("highScore",0);
+                SharedPreferences.Editor mEditor = mPref.edit();
+                if(score > highScore)
+                mEditor.putInt("highScore",score).commit();
+                else
+                {}
 
                 Toast toast =
-                        Toast.makeText(con, "Game Over " + planetsSetQueue.size() + " " + planetsAnimationQueue.size(), Toast.LENGTH_SHORT);
+                        Toast.makeText(con, "Game Over", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             }
