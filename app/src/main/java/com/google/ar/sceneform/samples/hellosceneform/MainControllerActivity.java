@@ -421,34 +421,35 @@ public class MainControllerActivity extends AppCompatActivity {
 
   private AnimatorSet updatePlanets() {
       AnimatorSet s = new AnimatorSet();
-      s.play(planetsMove());
-      s.addListener(new Animator.AnimatorListener() {
-          @Override
-          public void onAnimationStart(Animator animation) {
-              //endNode.setParent(null);
-          }
+      if(!collisionDetect()){
+          s.play(planetsMove());
+          s.addListener(new Animator.AnimatorListener() {
+              @Override
+              public void onAnimationStart(Animator animation) {
+                  //endNode.setParent(null);
+              }
 
-          @Override
-          public void onAnimationEnd(Animator animation) {
-              //planetsSetNode.setParent(null);
-              score++;
-              scoreView.setText("" + score);
-              planetsSetQueue.peek().setParent(null);
-              planetsSetQueue.remove();
-              planetsAnimationQueue.remove();
-          }
+              @Override
+              public void onAnimationEnd(Animator animation) {
+                  //planetsSetNode.setParent(null);
+                  score++;
+                  scoreView.setText("" + score);
+                  planetsSetQueue.peek().setParent(null);
+                  planetsSetQueue.remove();
+                  planetsAnimationQueue.remove();
+              }
 
-          @Override
-          public void onAnimationCancel(Animator animation) {
+              @Override
+              public void onAnimationCancel(Animator animation) {
 
-          }
+              }
 
-          @Override
-          public void onAnimationRepeat(Animator animation) {
-          }
-      });
-      if(!collisionDetect())
-      s.start();
+              @Override
+              public void onAnimationRepeat(Animator animation) {
+              }
+          });
+          s.start();
+      }
       else
       {
 
