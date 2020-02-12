@@ -170,6 +170,7 @@ public class MainControllerActivity extends AppCompatActivity {
                       if (andyRenderable == null || oneTimeFlag!=0) {
                           return;
                       }
+                      arFragment.getArSceneView().getPlaneRenderer().setVisible(false);
                       initialInstuc.setVisibility(View.INVISIBLE);
                       playButton.setVisibility(View.VISIBLE);
 
