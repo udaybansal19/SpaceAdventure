@@ -43,7 +43,9 @@ import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.math.Vector3Evaluator;
 import com.google.ar.sceneform.rendering.Color;
@@ -61,7 +63,7 @@ public class MainControllerActivity extends AppCompatActivity {
   private static final String TAG = MainControllerActivity.class.getSimpleName();
   private static final double MIN_OPENGL_VERSION = 3.0;
 
-  private ArFragment arFragment;
+  public ArFragment arFragment;
   private ModelRenderable andyRenderable;
   private ModelRenderable playerRenderable;
   ArrayList<ModelRenderable> spaceRenderable = new ArrayList<ModelRenderable>();
@@ -72,8 +74,8 @@ public class MainControllerActivity extends AppCompatActivity {
     private AnchorNode startNode;
     private AnchorNode endNode;
     private Queue<AnchorNode> planetsSetQueue = new LinkedList<>();
-    private Queue<ObjectAnimator> planetsAnimationQueue = new LinkedList<>();
-    private Node playerNode = new Node();
+    public Queue<ObjectAnimator> planetsAnimationQueue = new LinkedList<>();
+    public Node playerNode = new Node();
     private Node playerPositionNode = new Node();
     private Node rightNode = new Node();
     private Node leftNode = new Node();
@@ -83,14 +85,15 @@ public class MainControllerActivity extends AppCompatActivity {
     private int counterUpdatePlanets = 0;
     private TimeAnimator planetsMove;
     private TextView scoreView;
-    private TextView scoreViewGameEnd;
-    private LinearLayout gameEndLayout;
+    public TextView scoreViewGameEnd;
+    public LinearLayout gameEndLayout;
     private ImageButton restartButton;
-    private int score = 0;
-    private int highScore = 0;
+    public int score = 0;
+    public int highScore = 0;
     private int setNumber = 1;
     private int planetsMoveTime = 2100;
     private int nextPlanetSetIn = 620;
+    public boolean isColliding = false;
 
     private Vector3 scale = new Vector3(0.5f,0.5f,0.5f);
     private Vector3 startNodePosition = new Vector3(0f,0f,-1.7f);
@@ -109,6 +112,44 @@ public class MainControllerActivity extends AppCompatActivity {
 
     setContentView(R.layout.activity_ux);
     arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+
+   arFragment.getArSceneView().getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
+       @Override
+       public void onUpdate(FrameTime frameTime) {
+           if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
+               isColliding = true;
+               for(Node node1 : arFragment.getArSceneView().getScene().overlapTestAll(playerNode)){
+                   if(node1.getName().equalsIgnoreCase("node"))
+                       isColliding = false;
+                   else
+                   {
+                       isColliding = true;
+                   }
+               }
+               if(isColliding) {
+                   planetsMove().end();
+                   gameEndLayout.setVisibility(View.VISIBLE);
+                   //arFragment.getArSceneView().clearAnimation();
+                   for(ObjectAnimator objectAnimator : planetsAnimationQueue){
+                       objectAnimator.pause();
+                   }
+
+                   if(score > highScore){
+                       highScore = score;
+                       SharedPreferences mPref = getSharedPreferences("highScore",0);
+                       SharedPreferences.Editor mEditor = mPref.edit();
+                       mEditor.putInt("highScore",score).commit();
+                       scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+                   }
+                   else
+                   {
+                       scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+                   }
+
+               }
+           }
+       }
+   });
 
       SharedPreferences mPref = getSharedPreferences("highScore",MODE_PRIVATE);
       highScore = mPref.getInt("highScore",0);
@@ -288,42 +329,42 @@ public class MainControllerActivity extends AppCompatActivity {
   }
 
 
-    private boolean collisionDetect(){
-      boolean fla = false;
-        if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
-            fla=true;
-            for(Node node1 : arFragment.getArSceneView().getScene().overlapTestAll(playerNode)){
-                if(node1.getName().equalsIgnoreCase("node"))
-                    fla=false;
-                else
-                {
-                    fla=true;
-                }
-            }
-            if(fla) {
-                planetsMove.end();
-                gameEndLayout.setVisibility(View.VISIBLE);
-                //arFragment.getArSceneView().clearAnimation();
-                for(ObjectAnimator objectAnimator : planetsAnimationQueue){
-                    objectAnimator.pause();
-                }
-
-                if(score > highScore){
-                    highScore = score;
-                    SharedPreferences mPref = getSharedPreferences("highScore",0);
-                    SharedPreferences.Editor mEditor = mPref.edit();
-                    mEditor.putInt("highScore",score).commit();
-                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
-                }
-                else
-                {
-                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
-                }
-
-            }
-        }
-        return fla;
-    }
+//    private boolean collisionDetect(){
+//      boolean fla = false;
+//        if(arFragment.getArSceneView().getScene().overlapTestAll(playerNode).size()!=0){
+//            fla=true;
+//            for(Node node1 : arFragment.getArSceneView().getScene().overlapTestAll(playerNode)){
+//                if(node1.getName().equalsIgnoreCase("node"))
+//                    fla=false;
+//                else
+//                {
+//                    fla=true;
+//                }
+//            }
+//            if(fla) {
+//                planetsMove.end();
+//                gameEndLayout.setVisibility(View.VISIBLE);
+//                //arFragment.getArSceneView().clearAnimation();
+//                for(ObjectAnimator objectAnimator : planetsAnimationQueue){
+//                    objectAnimator.pause();
+//                }
+//
+//                if(score > highScore){
+//                    highScore = score;
+//                    SharedPreferences mPref = getSharedPreferences("highScore",0);
+//                    SharedPreferences.Editor mEditor = mPref.edit();
+//                    mEditor.putInt("highScore",score).commit();
+//                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+//                }
+//                else
+//                {
+//                    scoreViewGameEnd.setText("Score: " + score + "\nBest: " + highScore);
+//                }
+//
+//            }
+//        }
+//        return fla;
+//    }
 
   private TimeAnimator allPlanetsMove(){
 
@@ -402,7 +443,7 @@ public class MainControllerActivity extends AppCompatActivity {
 
   private AnimatorSet updatePlanets() {
       AnimatorSet s = new AnimatorSet();
-      if(!collisionDetect()){
+      if(!isColliding){
           s.play(planetsMove());
           s.addListener(new Animator.AnimatorListener() {
               @Override
@@ -438,7 +479,7 @@ public class MainControllerActivity extends AppCompatActivity {
       return s;
   }
 
-  private ObjectAnimator planetsMove(){
+  public ObjectAnimator planetsMove(){
 
       Node n = planetsSet();
       n.setParent(endNode);
